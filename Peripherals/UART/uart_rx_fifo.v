@@ -1,0 +1,25 @@
+module uart_rx_fifo #(
+    parameter B = 8,
+              W = 4,
+              s = 1,
+              TIMER = 434
+) (
+    input clk, reset, tdi, rd,
+    output [B-1:0] r_data,
+    output wire empty, full
+);
+    // Signal declaration
+    wire wr;
+    wire [B-1:0] w_data;
+    wire rx_tick;
+    // submodule instance
+    uart_receiver #(.b(B), .s(s), .TIMER(TIMER)) uart_rx (
+        clk, reset, tdi, rx_tick, w_data
+    );
+    fifo #(.B(B), .W(W)) uart_fifo_receiver (
+        clk, reset, rd, wr, w_data, empty, full, r_data
+    );
+    single_cycle_tick rd_configure (
+        clk, reset, rx_tick, wr
+    );
+endmodule

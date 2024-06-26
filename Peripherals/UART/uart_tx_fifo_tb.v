@@ -1,0 +1,30 @@
+`timescale 1ps/1ps
+module uart_tx_fifo_tb;
+    reg clk, reset, wr_i, start;
+    reg [7:0] w_data;
+    uart_tx_fifo #(.B(8), .W(2), .TIMER(5)) uut (
+        clk, reset, wr_i, start, w_data
+    );
+    initial begin
+        clk <= 0;start <= 0;w_data <= 8'h00; wr_i <= 0; reset <= 0; #20
+        reset <= 1; #20
+        reset <= 0;
+        w_data = 8'h05; wr_i <= 1; #20
+        wr_i <= 0; #20
+        w_data <= 8'h06; wr_i <= 1; #20
+        wr_i <= 0; #20
+        w_data <= 8'h07; wr_i <= 1; #20
+        wr_i <= 0; #30
+        w_data <= 8'h0f; wr_i <= 1; #20
+        wr_i <= 0; #20
+        w_data <= 8'haa;wr_i <= 1; #20
+        wr_i <= 0; #1000
+        w_data <= 8'haa;wr_i <= 1; #20
+        wr_i <= 0; #10
+        start <= 1; #20
+        start <= 0; #4000
+        start <= 1; #20
+        start <= 0;
+    end
+    always #10 clk <= ~clk;
+endmodule
