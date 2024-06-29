@@ -2,7 +2,7 @@
 module uart_tx_fifo_tb;
     reg clk, reset, wr_i, start;
     reg [7:0] w_data;
-    uart_tx_fifo #(.B(8), .W(2), .TIMER(5)) uut (
+    uart_tx_fifo #(.P(0), .W(2), .TIMER(5)) uut (
         clk, reset, wr_i, start, w_data
     );
     initial begin

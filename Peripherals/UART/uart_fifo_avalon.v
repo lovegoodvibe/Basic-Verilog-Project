@@ -1,5 +1,5 @@
 module uart_fifo_avalon #(
-    parameter B = 8,
+    parameter P = 0,
               W = 4,
               s = 1,
 			  TIMER = 434
@@ -19,10 +19,10 @@ module uart_fifo_avalon #(
 );
 // Signal declaration
     reg [31:0] data_tx, data_rx, status, control;
-    wire [B-1:0] w_data, r_data;
+    wire [7+P:0] w_data, r_data;
     wire start, wr, rd, full_fifo_tx, empty_fifo_tx, full_fifo_rx, empty_fifo_rx;
 // Submodule instance tx_fifo
-    uart_tx_fifo #(.B(B), .W(W), .s(s), .TIMER(TIMER)) uart_tx_fifo (
+    uart_tx_fifo #(.P(P), .W(W), .s(s), .TIMER(TIMER)) uart_tx_fifo (
         .clk(clk), .reset(~reset_n), .wr(wr), .start(start), .w_data(w_data), .full(full_fifo_tx), .empty(empty_fifo_tx), .tdo(tdo)
     );
     single_cycle_tick start_cofigure (
@@ -31,9 +31,9 @@ module uart_fifo_avalon #(
     single_cycle_tick wr_configure (
         clk, ~reset_n, control[0], wr
     );
-    assign w_data = data_tx[B-1:0];
+    assign w_data = data_tx[7+P:0];
 // Submodule instance rx_fifo
-    uart_rx_fifo #(.B(B), .W(W), .s(s), .TIMER(TIMER)) uart_rx_fifo (
+    uart_rx_fifo #(.P(P), .W(W), .s(s), .TIMER(TIMER)) uart_rx_fifo (
         .clk(clk), .reset(~reset_n), .tdi(tdi), .rd(rd), .r_data(r_data), .empty(empty_fifo_rx), .full(full_fifo_rx) 
     );
     single_cycle_tick rd_cofigure (
@@ -43,15 +43,15 @@ module uart_fifo_avalon #(
     always @(posedge clk or negedge reset_n) begin
         if(!reset_n) begin
             status [31:4] <= 21'b0;
-            data_rx [31:B] <= 21'b0;
+            data_rx [31:8+P] <= 21'b0;
             status[3:0] <= 4'b0;
-            data_rx <= {(B-1){1'b0}};
+            data_rx <= {(7+P){1'b0}};
 		end
         else begin
             status [31:4] <= 21'b0;
-            data_rx [31:B] <= 21'b0; 
+            data_rx [31:8+P] <= 21'b0; 
 			status[3:0] <= {empty_fifo_rx, full_fifo_rx, empty_fifo_tx, full_fifo_tx};
-            data_rx [B-1:0] <= r_data;
+            data_rx [7+P:0] <= r_data;
         end
     end
     always @ ( posedge clk or negedge reset_n )

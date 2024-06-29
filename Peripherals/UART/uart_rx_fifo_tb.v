@@ -4,10 +4,10 @@ module uart_rx_fifo_tb;
     wire tdi;
     reg rd;
     reg [7:0] w_data;
-    uart_tx_fifo #(.B(8), .W(2), .s(2), .TIMER(5)) uart_tx (
+    uart_tx_fifo #(.P(0), .W(2), .s(2), .TIMER(5)) uart_tx (
         .clk(clk), .reset(reset), .wr(wr_i), .start(start), .w_data(w_data), .tdo(tdi)
     );
-    uart_rx_fifo #(.B(8), .W(2), .s(2), .TIMER(5)) uut (
+    uart_rx_fifo #(.P(0), .W(2), .s(2), .TIMER(5)) uut (
         clk, reset, tdi, rd
     );   
     initial begin

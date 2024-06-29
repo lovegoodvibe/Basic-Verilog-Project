@@ -1,16 +1,16 @@
 module uart_transmitter #(
-    parameter b = 8, // number bit of parity + data
+    parameter P = 0, // number bit of parity + data
               s = 1, // number of stop bit
               TIMER = 434
 ) (
     input clk, reset, tx,
-    input [b-1:0] data_tx,
+    input [7+P:0] data_tx,
     output reg tx_tick, tdo
 );
     localparam IDLE = 1'b0,
                TX = 1'b1;
     // Signal declaration
-    reg [b:0] shift_reg;
+    reg [8+P:0] shift_reg;
     reg state;
     reg state_next = 1'b0, time_inc, bit_inc, reset_bit_counter;
 	wire time_tick, bit_tick;
@@ -20,11 +20,11 @@ module uart_transmitter #(
     always @(posedge clk) begin
         if(state)
             if (time_tick)
-                shift_reg <= {1'b1, shift_reg[b:1]};
+                shift_reg <= {1'b1, shift_reg[8+P:1]};
             else
                 shift_reg <= shift_reg;
         else 
-            shift_reg <= {data_tx[b-1:0], 1'b0}; // data + start_bit
+            shift_reg <= {data_tx[7+P:0], 1'b0}; // data + start_bit
     end
     // Output
     always @(posedge clk) begin
@@ -32,7 +32,7 @@ module uart_transmitter #(
     end
     assign tdo_next = state ? shift_reg [0] : 1'b1;
     // Control path 
-    counter #(.THRESHOLD_VALUE(b+s), .COUNTER_BIT_NUMBER (4)) bit_counter (
+    counter #(.THRESHOLD_VALUE(8+P+s), .COUNTER_BIT_NUMBER (4)) bit_counter (
         .clk(clk), .reset(reset || reset_bit_counter), .ctrl_inc(bit_inc), .tick(bit_tick));
     counter_continuous #(.THRESHOLD_VALUE(TIMER), .COUNTER_BIT_NUMBER(9)) time_counter (
         .clk(clk), .reset(reset), .ctrl_inc(time_inc), .tick(time_tick));

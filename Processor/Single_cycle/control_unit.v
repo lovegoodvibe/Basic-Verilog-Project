@@ -1,0 +1,60 @@
+module control_unit (
+    input [2:0] opcode,
+    output reg rd_mem, wr_A, wr_B, wr_mem, jmp,
+    output reg [1:0] alu_op
+);
+    // symbolic state declaration
+    parameter LOAD_A = 3'b000,
+              LOAD_B = 3'b001,
+              STORE = 3'b010,
+              JMP = 3'b011,
+              ADD = 3'b100,
+              SUB = 3'b101,
+              AND = 3'b110,
+              OR = 3'b111;
+    // signal declaration
+    // body
+    // state register
+    // FSM data path (counter) next-state logic
+    // FSM control path next-state logic
+    always @(*) begin
+        wr_A = 0;
+        wr_B = 0;
+        rd_mem = 0;
+        wr_mem = 0;
+        jmp = 0;
+        alu_op = 2'b00;
+        case (opcode)
+            LOAD_A: begin
+                wr_A = 1;
+                rd_mem = 1;
+            end
+            LOAD_B : begin
+                wr_B = 1;
+                rd_mem = 1;
+            end
+            STORE: begin
+                wr_mem = 1;
+            end 
+            JMP: begin
+                jmp = 1;
+            end
+            ADD: begin
+                alu_op = 2'b00;
+                wr_A = 1;
+            end
+            SUB: begin
+                alu_op = 2'b01;
+                wr_A = 1;
+            end
+            AND: begin
+                alu_op = 2'b10;
+                wr_A = 1;
+            end
+            OR: begin
+                alu_op = 2'b11;
+                wr_A = 1;
+            end 
+        endcase
+    end
+endmodule

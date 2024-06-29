@@ -1,0 +1,10 @@
+module instruction_memory (
+    input clk,
+    input [4:0] address_read,
+    output [7:0] instruction
+);
+    reg instruction_file [7:0] {31:0};
+    always @(posedge clk) begin
+        instruction <= instruction_file [address_read];
+    end
+endmodule

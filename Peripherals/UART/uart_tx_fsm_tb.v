@@ -1,7 +1,7 @@
 module uart_tx_fsm_tb;
     reg clk, reset, tx;
     reg [7:0] data_tx;
-    uart_transmitter #(.TIMER(10), .b(8)) uut (.clk(clk), .reset(reset), .tx(tx), .data_tx(data_tx));
+    uart_transmitter #(.TIMER(10), .P(0)) uut (.clk(clk), .reset(reset), .tx(tx), .data_tx(data_tx));
     initial begin
         clk <= 0;
         reset <= 0;

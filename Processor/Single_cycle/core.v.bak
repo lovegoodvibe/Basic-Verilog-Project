@@ -1,0 +1,49 @@
+module core (
+    input clk,
+    output [7:0] out
+);
+    // symbolic state declaration
+    // signal declaration
+    reg pc;
+    reg [7:0] instruction;
+    wire wr_A, wr_B, rd_mem, wr_mem, jmp;
+    wire [1:0] alu_op;
+    reg [7:0] A, B;
+    wire [7:0] result;
+    // body
+    // state register
+    // FSM data path (counter) next-state logic
+    instruction_memory instruction_file (.clk(clk), .address_read(pc), 
+                                         .instruction(instruction));
+    alu alu (.alu_op(alu_op), .A(A), .B(B), .result(result));
+    data_memory data_file (.wr(wr_mem), .rd(rd_mem), .address_read(address_read_mem), 
+                           .address_write(address_write_mem),
+                           .data_read(data_read_mem), .data_write(data_write_mem));
+    control_unit cu (.opcode(instruction [7:5]), 
+                     .rd_mem(rd_mem), .wr_A(wr_A), .wr_B(wr_B), 
+                     .wr_mem(wr_mem), .jmp(jmp), 
+                     .alu_op(alu_op));
+    always @(*) begin
+        if (rd_mem)
+            address_read_mem <= instruction [4:0];
+        else if (wr_mem)
+            address_write_mem <= instruction [4:0];
+    end 
+    always @(*) begin
+        if (wr_A)
+            if (rd_mem) 
+                A <= data_read_mem;
+            else    
+                A <= result;
+        if (wr_B)
+            B <= data_write_mem;
+    end 
+    assign out = result;
+    // FSM control path next-state logic   
+    always @(posedge clk) begin
+        if (jmp)
+            pc <= instruction [4:0];
+        else
+            pc <= pc + 1;
+    end
+endmodule

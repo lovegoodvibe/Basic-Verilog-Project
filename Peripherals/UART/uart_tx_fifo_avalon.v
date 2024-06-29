@@ -1,5 +1,5 @@
 module uart_tx_fifo_avalon #(
-    parameter B = 8,
+    parameter P = 0,
               W = 4,
               s = 1,
 			  TIMER = 434
@@ -18,10 +18,10 @@ module uart_tx_fifo_avalon #(
 );
     // Signal declaration
     reg [31:0] data, status, control;
-    wire [B-1:0] w_data;
+    wire [7+P:0] w_data;
     wire start, wr, full, empty;
     // Submodule instance
-    uart_tx_fifo #(.B(B), .W(W), .s(s), .TIMER(TIMER)) uart_tx_fifo (
+    uart_tx_fifo #(.P(P), .W(W), .s(s), .TIMER(TIMER)) uart_tx_fifo (
         .clk(clk), .reset(~reset_n), .wr(wr), .start(start), .w_data(w_data), .full(full), .empty(empty), .tdo(tdo)
     );
     single_cycle_tick start_cofigure (
@@ -30,7 +30,7 @@ module uart_tx_fifo_avalon #(
     single_cycle_tick wr_configure (
         clk, ~reset_n, control[0], wr
     );
-    assign w_data = data[B-1:0];
+    assign w_data = data[7+P:0];
     always @(posedge clk or negedge reset_n) begin
         if(!reset_n)
             status[31:0] <= {32{1'b0}};

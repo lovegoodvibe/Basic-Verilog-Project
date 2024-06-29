@@ -1,0 +1,14 @@
+module data_memory (
+    input wr, rd,
+    input [4:0] address_read, address_write,
+    input [7:0] data_read,
+    output [7:0] data_write
+);
+    reg data_file [7:0] [31:0];
+    always @(*) begin
+        if (rd)
+            data_read <= data_file [address_read];
+        else if (wr)
+            data_file [address_write] <= data_write;
+    end
+endmodule

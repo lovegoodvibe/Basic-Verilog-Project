@@ -3,10 +3,10 @@ module uart_rx_fsm_tb;
     reg clk, reset, wr_i, start;
     wire tdi;
     reg [7:0] w_data;
-    uart_tx_fifo #(.B(8), .W(2), .s(2), .TIMER(5)) uart_tx (
+    uart_tx_fifo #(.P(0), .W(2), .s(2), .TIMER(5)) uart_tx (
         .clk(clk), .reset(reset), .wr(wr_i), .start(start), .w_data(w_data), .tdo(tdi)
     );
-    uart_receiver #(.b(8), .s(2), .TIMER(5)) uut (
+    uart_receiver #(.P(0), .s(2), .TIMER(5)) uut (
         clk, reset, tdi
     );   
     initial begin

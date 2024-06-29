@@ -1,18 +1,18 @@
 module uart_receiver #(
-    parameter b = 8,
+    parameter P = 0,
               s = 1,
               TIMER = 434
 ) (
     input clk, reset, tdi,
     output reg rx_tick,
-    output [b-1:0] data_rx
+    output [7+P:0] data_rx
 );
     localparam IDLE = 2'b00,
                START = 2'b01,
                RX = 2'b10,
                STOP = 2'B11;
     // Signal declaration
-    reg [b-1:0] shift_reg;
+    reg [7+P:0] shift_reg;
     reg [1:0] state, state_next;
     reg bit_inc, stop_inc, time_inc, start_inc;
     wire bit_tick, stop_tick, time_tick, start_tick; 
@@ -22,11 +22,11 @@ module uart_receiver #(
     always @(posedge clk) begin
         if (state)
             if(time_tick)
-                shift_reg <= {tdi, shift_reg[b-1:1]};
+                shift_reg <= {tdi, shift_reg[7+P:1]};
             else
                 shift_reg <= shift_reg;
         else    
-            shift_reg <= {b{1'b0}}; 
+            shift_reg <= {(8+P){1'b0}}; 
     end
     // Output
     assign data_rx = shift_reg; 
@@ -37,7 +37,7 @@ module uart_receiver #(
     counter_continuous #(.THRESHOLD_VALUE(TIMER), .COUNTER_BIT_NUMBER(9)) time_counter (
         .clk(clk), .reset(reset), .ctrl_inc(time_inc), .tick(time_tick)
     );
-    counter #(.THRESHOLD_VALUE(b-1), .COUNTER_BIT_NUMBER(4)) bit_counter (
+    counter #(.THRESHOLD_VALUE(7+P), .COUNTER_BIT_NUMBER(4)) bit_counter (
         .clk(clk), .reset(reset || reset_bit_counter), .ctrl_inc(bit_inc), .tick(bit_tick)
     );
     counter #(.THRESHOLD_VALUE(s-1), .COUNTER_BIT_NUMBER(4)) stop_counter (
